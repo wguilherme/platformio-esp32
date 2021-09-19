@@ -1,40 +1,52 @@
-#include <Arduino.h>
 
-#define led25 25
-#define led26 26
-#define led27 27
-int velocity = 150;
+#include <Arduino.h>
+int freq = 2000;
+int channel = 0;
+int resolution = 8;
+
+void playScale(uint8_t pin, uint8_t channel)
+{
+  uint8_t octave = 4;
+
+  ledcAttachPin(pin, channel);
+
+  note_t melody[] = {NOTE_C, NOTE_C, NOTE_C, NOTE_F, NOTE_F, NOTE_F, NOTE_D, NOTE_D, NOTE_D};
+  note_t melody2[] = {
+      NOTE_F,
+      NOTE_F,
+      NOTE_F,
+      NOTE_D,
+      NOTE_D,
+      NOTE_D,
+      NOTE_C,
+      NOTE_C,
+      NOTE_C,
+  };
+
+  for (int i = 0; i <= sizeof(melody); i++)
+  {
+    ledcWriteNote(channel, melody[i], octave);
+    ledcWriteNote(1, melody2[i], octave);
+    delay(100);
+  }
+  ledcDetachPin(pin);
+}
 
 void setup()
 {
-  pinMode(led25, OUTPUT);
-  pinMode(led26, OUTPUT);
-  pinMode(led27, OUTPUT);
-  delay(250);
 
   Serial.begin(115200);
+  ledcSetup(channel, freq, resolution);
+  ledcAttachPin(25, channel);
 }
 
 void loop()
 {
-  // put your setup code here, to run once:
-  Serial.println("log response");
-  delay(1 * velocity);
-  digitalWrite(led25, LOW);
-  delay(2 * velocity);
-  digitalWrite(led26, LOW);
-  delay(3 * velocity);
-  digitalWrite(led27, LOW);
 
-  delay(1 * velocity);
+  // ledcWriteTone(channel, 2000);
 
-  digitalWrite(led25, HIGH);
-  delay(2 * velocity);
-  digitalWrite(led26, HIGH);
-  delay(3 * velocity);
-  digitalWrite(led27, HIGH);
+  playScale(25, 0);
+  // ledcWrite(channel, 125);
 
-  velocity -= 20;
-  if (velocity < 20)
-    velocity = 19;
+  delay(1000);
 }
